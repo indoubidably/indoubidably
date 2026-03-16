@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Shortlist — A build log by Nan Doud. How I designed and built an AI-powered job matching app from scratch." />
+  <title>Shortlist — A Build Log | Nan Doud</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1620;
+      --muted: #5a5570;
+      --faint: #a09ab0;
+      --rule: #e0dcea;
+      --bg: #fdfcfa;
+      --surface: #f5f3f0;
+      --accent: #00c4d4;
+      --pink: #e8006a;
+      --yellow: #f5c400;
+      --tag-bg: #f0eef8;
+      --tag-text: #4a3d7a;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 17px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: var(--accent); width: 0%; z-index: 200;
+      transition: width 0.1s;
+    }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(253,252,250,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-home {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px; font-weight: 500;
+      color: var(--ink); text-decoration: none;
+      letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-size: 12px; color: var(--muted);
+      text-decoration: none; font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.03em; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+    .container-wide { max-width: 1040px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+    .hero { padding: 80px 0 64px; border-bottom: 1px solid var(--rule); }
+    .hero-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 24px; display: block;
+    }
+    .hero h1 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700; line-height: 1.15;
+      color: var(--ink); margin-bottom: 28px;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 em { font-style: italic; color: var(--muted); }
+    .hero-lede {
+      font-size: 18px; color: var(--muted);
+      line-height: 1.75; max-width: 580px; margin-bottom: 36px;
+    }
+    .hero-meta { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+    .meta-item {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; color: var(--faint); letter-spacing: 0.04em;
+    }
+    .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 28px; }
+    .tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; padding: 4px 10px;
+      border-radius: 3px; letter-spacing: 0.04em;
+      background: var(--tag-bg); color: var(--tag-text);
+    }
+    .video-block { padding: 56px 0; border-bottom: 1px solid var(--rule); }
+    .video-frame {
+      background: var(--ink); border-radius: 10px; overflow: hidden;
+      aspect-ratio: 16/9;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .video-placeholder { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 40px; }
+    .play-btn {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 22px; cursor: pointer; transition: all 0.2s;
+    }
+    .play-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .video-note { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); }
+    .video-caption {
+      font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+      color: var(--faint); margin-top: 14px; text-align: center; letter-spacing: 0.04em;
+    }
+    .section { padding: 64px 0; border-bottom: 1px solid var(--rule); }
+    .section-num {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint);
+      margin-bottom: 8px; display: block;
+    }
+    .section h2 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(22px, 3vw, 30px); font-weight: 700;
+      line-height: 1.25; color: var(--ink); margin-bottom: 28px;
+      letter-spacing: -0.015em;
+    }
+    .section h3 {
+      font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+      font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 40px 0 16px;
+    }
+    p { margin-bottom: 20px; }
+    p:last-child { margin-bottom: 0; }
+    .callout {
+      background: var(--surface); border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0; padding: 20px 24px; margin: 32px 0;
+    }
+    .callout p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+    .callout strong { color: var(--ink); }
+    .pull-quote {
+      padding: 32px 0; margin: 40px 0;
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule);
+    }
+    .pull-quote p {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(17px, 2.5vw, 22px);
+      line-height: 1.55; color: var(--ink); font-style: italic; margin: 0;
+    }
+    .prompt-block {
+      background: var(--ink); border-radius: 8px;
+      padding: 28px 32px; margin: 32px 0;
+    }
+    .prompt-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 16px; display: block;
+    }
+    .prompt-text {
+      font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+      line-height: 1.7; color: rgba(255,255,255,0.75); white-space: pre-wrap;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0; }
+    .col-card { background: var(--surface); border-radius: 8px; padding: 24px; }
+    .col-card h4 {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 14px;
+    }
+    .col-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .col-card li { font-size: 14px; color: var(--muted); padding-left: 18px; position: relative; line-height: 1.5; }
+    .col-card li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 2px; }
+    .lesson { padding: 28px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 28px 1fr; gap: 20px; align-items: flex-start; }
+    .lesson:last-child { border-bottom: none; }
+    .lesson-num { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); padding-top: 5px; }
+    .lesson-body h4 { font-family: 'Libre Baskerville', serif; font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 10px; letter-spacing: -0.01em; }
+    .lesson-body p { font-size: 15px; color: var(--muted); margin: 0; }
+    .status-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .status-table th { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); text-align: left; padding: 10px 0; border-bottom: 2px solid var(--ink); }
+    .status-table td { font-size: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); color: var(--muted); vertical-align: top; }
+    .status-table td:first-child { color: var(--ink); font-weight: 500; padding-right: 24px; width: 50%; }
+    .pill { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 20px; }
+    .pill.done { background: rgba(0,196,212,0.12); color: #007a88; }
+    .pill.wip { background: rgba(245,196,0,0.12); color: #9A7800; }
+    .pill.later { background: var(--tag-bg); color: var(--tag-text); }
+    .about-block {
+      padding: 56px 0;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+    }
+    .about-block h2 { font-family: 'Libre Baskerville', serif; font-size: 26px; font-weight: 700; color: var(--ink); margin-bottom: 20px; letter-spacing: -0.015em; }
+    .about-block p { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
+    .about-links { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+    .about-link { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+    .about-link:hover { color: var(--ink); }
+    .about-right { background: var(--surface); border-radius: 10px; padding: 28px; }
+    .about-right h3 { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; }
+    .skill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill { font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 10px; border-radius: 3px; background: white; border: 1px solid var(--rule); color: var(--muted); }
+    footer { padding: 40px 0; border-top: 2px solid var(--ink); position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--faint); }
+    .footer-left strong { color: var(--ink); display: block; font-size: 14px; margin-bottom: 4px; }
+    .footer-right { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); text-align: right; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 720px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .container, .container-wide { padding: 0 20px; }
+      .hero { padding: 48px 0 40px; }
+      .two-col { grid-template-columns: 1fr; }
+      .about-block { grid-template-columns: 1fr; gap: 32px; }
+      .lesson { grid-template-columns: 24px 1fr; gap: 14px; }
+      footer { flex-direction: column; align-items: flex-start; }
+      .footer-right { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<nav>
+  <a href="#" class="nav-home">
+    <div class="nav-dot"></div>
+    Nan Doud / Shortlist
+  </a>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#how">How I Built It</a></li>
+    <li><a href="#decisions">Decisions</a></li>
+    <li><a href="#learned">What I Learned</a></li>
+    <li><a href="#status">Current State</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="container">
+  <div class="hero reveal">
+    <span class="hero-kicker">Build Log — March 2026</span>
+    <h1>I built a job search tool<br/>to solve <em>my own problem.</em><br/>Here's what happened.</h1>
+    <p class="hero-lede">Shortlist is an AI-powered job matching app I designed and built independently. This is the working record of how it came together — the decisions, the tradeoffs, the things that broke, and what I learned.</p>
+    <div class="hero-meta">
+      <div class="meta-item">Nan Doud</div>
+      <div class="meta-item" style="color:var(--rule)">—</div>
+      <div class="meta-item">Solo build</div>
+      <div class="meta-item" style="color:var(--rule)">—</div>
+      <div class="meta-item">Active</div>
+    </div>
+    <div class="hero-tags">
+      <span class="tag">Python / Flask</span>
+      <span class="tag">Claude API</span>
+      <span class="tag">Claude Code</span>
+      <span class="tag">Product Design</span>
+      <span class="tag">UX Writing</span>
+      <span class="tag">AI Integration</span>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO -->
+<div class="container">
+  <div class="video-block reveal">
+    <div class="video-frame">
+      <div class="video-placeholder">
+        <div class="play-btn">▶</div>
+        <p class="video-note">Demo video — add your embed here</p>
+      </div>
+    </div>
+    <p class="video-caption">Demo walkthrough — condensed for time. The Coach conversation runs longer in practice.</p>
+  </div>
+</div>
+
+<!-- SECTION 1: THE PROBLEM -->
+<div class="container">
+  <div class="section reveal" id="problem">
+    <span class="section-num">01 — The Problem</span>
+    <h2>Job search tools were built for databases. Not people.</h2>
+
+    <p>I've spent years inside product and operations teams watching how friction accumulates when nobody asks whether the flow actually works for the person using it. When I started job searching in earnest, I turned that same lens on the process itself.</p>
+
+    <p>The tools were bad in a specific way. They let you pick a title from a dropdown and check "remote" and call that a search. They had no way to capture what I'd walk away from, or what kind of environment made me do my best work, or that I've been quietly drawn to automation-forward companies for years without quite knowing how to say it.</p>
+
+    <div class="pull-quote">
+      <p>"A job search should start with a real conversation, not a form. The thinking behind Shortlist is that simple."</p>
+    </div>
+
+    <p>So I built something that starts with a conversation instead. An AI coach interviews you about your actual experience, values, and preferences. It synthesizes that into a structured profile. Then it scores job listings against the whole picture and surfaces results with plain-language explanations. Everything runs locally on your machine. No account. No server.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What wasn't working</h4>
+        <ul>
+          <li>Keyword matching with no understanding of context</li>
+          <li>No way to express values, culture fit, or deal-breakers</li>
+          <li>Results that required hours of filtering to be usable</li>
+          <li>No explanation for why a job was surfaced</li>
+          <li>Stale, recycled, and scam listings in every search</li>
+        </ul>
+      </div>
+      <div class="col-card">
+        <h4>What Shortlist does instead</h4>
+        <ul>
+          <li>Builds a full profile from natural conversation</li>
+          <li>Scores jobs against the whole person, not just titles</li>
+          <li>Explains every result before the user clicks</li>
+          <li>Filters stale and low-signal postings automatically</li>
+          <li>Runs locally with the user's own API keys</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: HOW I BUILT IT -->
+<div class="container">
+  <div class="section reveal" id="how">
+    <span class="section-num">02 — How I Built It</span>
+    <h2>The stack, the approach, and how I actually worked.</h2>
+
+    <h3>The Stack</h3>
+    <p>Python and Flask on the backend. Plain HTML, CSS, and JavaScript on the front end with no framework. The Claude API powers the Coach conversation, profile synthesis, and job scoring. JSearch via RapidAPI pulls job listing data. Everything runs locally, packaged for distribution via PyInstaller.</p>
+
+    <h3>Working with Claude Code</h3>
+    <p>I am not a software engineer. I want to be upfront about that. I used Claude Code extensively throughout this build. Claude Code is an agentic coding tool that writes, runs, and debugs code directly. My job was to think clearly about what I wanted, communicate it precisely, and make good decisions about what it produced.</p>
+
+    <p>That turned out to be most of the job.</p>
+
+    <p>Every feature in this app started as a prompt I wrote. A structured spec with clear behavior definitions, edge cases, implementation notes, and test criteria. I wrote hundreds of these over the course of the build.</p>
+
+    <div class="callout">
+      <p><strong>Writing a good Claude Code prompt requires the same skills as writing a good project brief.</strong> Clear problem framing, explicit success criteria, awareness of edge cases, and enough systems thinking to anticipate what could go wrong. The prompts are artifacts of structured thinking, not just instructions to a machine.</p>
+    </div>
+
+    <p>Here's an example from the ATS quality weighting feature, which scores job results higher when they come from Greenhouse, Lever, or Ashby (platforms that tend to attract more established, intentional employers):</p>
+
+    <div class="prompt-block">
+      <span class="prompt-label">Sample Claude Code Prompt — ATS Quality Weighting</span>
+      <span class="prompt-text">I want to add ATS-based quality weighting to the search results pipeline.
+The goal is to surface results from quality ATS platforms (Greenhouse,
+Lever, Ashby) higher in the ranked results, and deprioritize Workday
+unless the user has explicitly adjusted their preferences.
+
+WHERE TO MAKE THE CHANGE
+Find the section of code where JSearch results are received and processed
+before scoring. The weighting logic should be applied after scoring is
+complete, as a final ranking multiplier before results are sorted.
+
+ATS DETECTION
+Each JSearch result includes a job_apply_link field. Use this URL to
+detect the ATS platform:
+- Greenhouse: job_apply_link contains boards.greenhouse.io
+- Lever:       job_apply_link contains jobs.lever.co
+- Ashby:       job_apply_link contains ashbyhq.com
+- Workday:     job_apply_link contains myworkdayjobs.com
+
+SCORE WEIGHTING
+After the Claude fit score (1-10) is assigned, apply a multiplier:
+- Greenhouse: 1.15
+- Lever:      1.10
+- Ashby:      1.10
+- Unknown:    1.0
+- Workday:    0.85
+
+The displayed score should still show the original Claude fit score.
+The multiplier only affects sort order.
+
+IMPLEMENTATION NOTES
+- Log detected ATS and final_score to console during development
+- Manually evaluated jobs in My Shortlist tab are not affected</span>
+    </div>
+
+    <h3>What I Was Actually Doing All Day</h3>
+    <p>On any given day I was doing some mix of identifying what wasn't working and figuring out why, writing prompts that specified what I wanted with enough precision that the output was actually usable, reviewing what got built, testing it, and deciding what to change next. I was also making product decisions about what to build, what to cut, and what the right UX pattern was. And I was writing all the copy — app UI, landing page, legal docs, LinkedIn posts. And designing two full visual themes.</p>
+
+    <p>This is not how most software gets built. But it taught me a lot about what clear thinking looks like in practice, and how much leverage you can get from communication skills when the tools are this capable.</p>
+  </div>
+</div>
+
+<!-- SECTION 3: PRODUCT DECISIONS -->
+<div class="container">
+  <div class="section reveal" id="decisions">
+    <span class="section-num">03 — Product Decisions</span>
+    <h2>Some things I got right. Some things I'm still fixing.</h2>
+
+    <h3>What I Got Right</h3>
+    <p>The Coach conversation model was the right call from day one. The whole product rests on the idea that you should describe yourself in natural language and the tool should do the translation work. Every feature decision downstream flows from that.</p>
+
+    <p>Making the profile fully editable by the user was also a deliberate call, and I think it was the most important trust decision I made. AI synthesizes well but it also overstates, smooths over gaps, and occasionally invents details that sound plausible. A job seeker's profile is not the place to let that slide. Making every section editable means the user stays in control of their own representation. They can catch anything that doesn't sound right or accurate and fix it before it affects their results. That's how a tool earns trust — by not asking you to trust it blindly.</p>
+
+    <p>The three-tab structure on the Evaluations page took several iterations to get right. The Longlist, My Finds, My Shortlist. The final version reflects a real mental model: here's what the app found, here's what you found yourself, here's what you've decided to act on. That progression matters.</p>
+
+    <p>The Tracker was a late addition and it might be the most useful feature for actual job seekers. Moving from passive matching to active pipeline management — with interview round tracking, interviewer profiles, a salary negotiation workspace, and a Lessons Learned field per role — closes a gap that no other tool I know of addresses cleanly.</p>
+
+    <h3>What I'm Still Fixing</h3>
+    <p>The Near You geography results were wrong for longer than I wanted. The app kept pulling results from the DC/Virginia area regardless of what location the user set. I sent multiple fix prompts before it resolved. The root cause was that JSearch's geographic bias was being set at query time, and an earlier performance optimization prompt had broken the parameter passing. Debugging it required tracing the full data pipeline across three files.</p>
+
+    <p>The "Have you applied?" button took four attempts to get inside the card and functional. I'm including this because the debugging process — reading screenshots, identifying what was actually wrong versus what looked wrong, writing increasingly specific fix prompts — is a real skill that I got better at over the course of this project.</p>
+
+    <h3>Decisions I Deferred Deliberately</h3>
+    <p>Windows support, PyInstaller packaging, and the Gumroad listing are all on the roadmap but not done. I made a deliberate call to keep building features rather than packaging for distribution while the product was still evolving. The product I'd have shipped two months ago was worse than what I have now.</p>
+  </div>
+</div>
+
+<!-- SECTION 4: WHAT I LEARNED -->
+<div class="container">
+  <div class="section reveal" id="learned">
+    <span class="section-num">04 — What I Learned</span>
+    <h2>The things I'd tell myself at the start.</h2>
+
+    <div class="lesson">
+      <div class="lesson-num">01</div>
+      <div class="lesson-body">
+        <h4>Precision is the skill.</h4>
+        <p>Vague prompts produce vague output. The difference between a prompt that works and one that doesn't is almost always specificity — about behavior, about edge cases, about what the output should look like and how it should fail gracefully. Writing a good prompt is a thinking exercise, not a writing exercise. You can't be precise about something you haven't thought through clearly.</p>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <div class="lesson-num">02</div>
+      <div class="lesson-body">
+        <h4>Systems break at the seams.</h4>
+        <p>Almost every bug I encountered happened at the boundary between two features — where a new prompt touched code that a previous prompt had written. Keeping a mental model of how the whole thing fit together was as important as writing good individual prompts. The more the codebase grew, the more I had to think like a systems architect rather than a feature writer.</p>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <div class="lesson-num">03</div>
+      <div class="lesson-body">
+        <h4>Ship the thing that's wrong and then fix it.</h4>
+        <p>I spent too long on some features trying to get them right before they were visible. The features I iterated fastest on were the ones I looked at in the actual app, reacted to honestly, and fixed specifically. Screenshots are better feedback than imagination. A thing that exists and is wrong is more useful than a perfect spec for something that doesn't.</p>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <div class="lesson-num">04</div>
+      <div class="lesson-body">
+        <h4>Good UX writing is a product decision.</h4>
+        <p>Every label, every empty state, every error message is a decision about what the user believes the product does. I wrote all of it, which meant I had to think carefully about all of it. "Have you applied?" is a better label than "Update status" because it meets the user where they are instead of asking them to learn the app's language. These decisions compound.</p>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <div class="lesson-num">05</div>
+      <div class="lesson-body">
+        <h4>Design for the failure modes, not just the happy path.</h4>
+        <p>The most important AI design decision I made was making the user's profile fully editable. Coach synthesizes well, but it also generalizes, occasionally overstates, and sometimes fills in gaps with plausible-sounding details that aren't accurate. For something as consequential as how a person represents themselves to a potential employer, that's not acceptable. Putting the user in control of the final output is the right answer. Knowing when to trust AI and when to verify it is the real skill. Building a product that makes verification the default is how you make that call for your users before they have to make it themselves.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: CURRENT STATE -->
+<div class="container">
+  <div class="section reveal" id="status">
+    <span class="section-num">05 — Current State</span>
+    <h2>Where it is now. Honest assessment.</h2>
+
+    <p>Shortlist works. I use it. It surfaces real results and the scores are meaningful. Coach builds profiles that sound like the people who created them.</p>
+
+    <table class="status-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Coach conversation and profile synthesis</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Job matching and ATS quality weighting</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Three-tab Evaluations page (Longlist, My Finds, My Shortlist)</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Careers page scanner with Ashby, Lever, Greenhouse API integration</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Job pipeline Tracker with round tracking and Lessons Learned</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Electric Youth light mode with full theme switching</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Offer stage with Levels.fyi integration and negotiation tools</td><td><span class="pill done">Working</span></td></tr>
+        <tr><td>Resume quality assessment and Coach rebuild offer</td><td><span class="pill wip">In progress</span></td></tr>
+        <tr><td>Accessibility toggles (Reduce Motion, Font Size, High Contrast)</td><td><span class="pill wip">In progress</span></td></tr>
+        <tr><td>PyInstaller packaging for distribution</td><td><span class="pill later">Deferred</span></td></tr>
+        <tr><td>Windows support</td><td><span class="pill later">Roadmap</span></td></tr>
+        <tr><td>Scheduled search</td><td><span class="pill later">Roadmap</span></td></tr>
+      </tbody>
+    </table>
+
+    <p>This is still an active build. I'm sharing it because the process is at least as interesting as the product, and because I think building something real with these tools says more about how I work than a resume does.</p>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="container">
+  <div class="about-block reveal">
+    <div>
+      <h2>Nan Doud</h2>
+      <p>Operations and communications professional based in East Peoria, IL. I've spent years inside product and operations teams at organizations ranging from SaaS startups to healthcare to real estate. I think clearly about systems, communicate precisely, and build things that work for real people.</p>
+      <p>Shortlist is the clearest demonstration I have of how I actually work.</p>
+      <div class="about-links">
+        <a href="https://linkedin.com/in/nan-doud" class="about-link" target="_blank" rel="noopener">↗ linkedin.com/in/nan-doud</a>
+        <a href="https://nanedoud.wixsite.com/ux-designer" class="about-link" target="_blank" rel="noopener">↗ UX Portfolio</a>
+      </div>
+    </div>
+    <div class="about-right">
+      <h3>Skills demonstrated in this build</h3>
+      <div class="skill-list">
+        <span class="skill">Product strategy</span>
+        <span class="skill">AI prompt engineering</span>
+        <span class="skill">UX design</span>
+        <span class="skill">UX writing</span>
+        <span class="skill">Systems thinking</span>
+        <span class="skill">Python / Flask</span>
+        <span class="skill">HTML / CSS / JS</span>
+        <span class="skill">Claude API</span>
+        <span class="skill">Cross-functional thinking</span>
+        <span class="skill">Debugging</span>
+        <span class="skill">Iterative development</span>
+        <span class="skill">Go-to-market planning</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <footer>
+    <div class="footer-left">
+      <strong>Shortlist — A Build Log</strong>
+      Nan Doud, East Peoria IL — March 2026
+    </div>
+    <div class="footer-right">
+      Built with Python, Flask, and the Claude API.<br/>
+      Directed with a lot of carefully written prompts.
+    </div>
+  </footer>
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('progress').style.width = (scrolled / total * 100) + '%';
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
