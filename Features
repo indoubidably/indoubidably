@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Shortlist — Features. A conversation-based AI job matching and pipeline tracking app." />
+  <title>Shortlist — Features | Nan Doud</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0c1a;
+      --surface: #11132b;
+      --surface2: #161836;
+      --border: #1e2040;
+      --yellow: #f5e642;
+      --cyan: #00e5ff;
+      --orange: #ff6b2b;
+      --pink: #ff2d78;
+      --text: #e8eaf6;
+      --muted: #8a9099;
+      --faint: #444860;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 17px; line-height: 1.75; overflow-x: hidden; }
+
+    .streaks { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .streak { position: absolute; height: 1.5px; border-radius: 2px; opacity: 0; animation: streakSlide linear infinite; }
+    .streak:nth-child(1) { top: 8%; width: 200px; background: linear-gradient(90deg,transparent,var(--cyan),transparent); animation-duration: 9s; }
+    .streak:nth-child(2) { top: 22%; width: 160px; background: linear-gradient(90deg,transparent,var(--yellow),transparent); animation-duration: 7s; animation-delay: 2s; }
+    .streak:nth-child(3) { top: 55%; width: 260px; background: linear-gradient(90deg,transparent,var(--pink),transparent); animation-duration: 11s; animation-delay: 4s; }
+    .streak:nth-child(4) { top: 75%; width: 180px; background: linear-gradient(90deg,transparent,var(--orange),transparent); animation-duration: 8s; animation-delay: 6s; }
+    .streak:nth-child(5) { top: 88%; width: 220px; background: linear-gradient(90deg,transparent,var(--cyan),transparent); animation-duration: 10s; animation-delay: 1s; }
+    @keyframes streakSlide { 0% { left: -320px; opacity: 0; } 8% { opacity: 0.6; } 85% { opacity: 0.3; } 100% { left: 110%; opacity: 0; } }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,12,26,0.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px; display: flex; align-items: center; justify-content: space-between; height: 56px;
+    }
+    .nav-logo { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--yellow); text-decoration: none; letter-spacing: 0.08em; text-shadow: 0 0 16px rgba(245,230,66,0.4); }
+    .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
+    .nav-links a { font-size: 12px; color: var(--muted); text-decoration: none; font-family: 'Space Mono', monospace; letter-spacing: 0.04em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-links .back { color: var(--faint); }
+    .nav-links .back:hover { color: var(--muted); }
+
+    section { position: relative; z-index: 1; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+    /* HERO */
+    .hero { padding: 80px 0 64px; border-bottom: 1px solid var(--border); }
+    .hero-kicker { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); margin-bottom: 20px; display: block; opacity: 0.8; }
+    .hero h1 { font-family: 'Space Mono', monospace; font-size: clamp(28px, 4vw, 48px); font-weight: 700; line-height: 1.15; color: var(--text); margin-bottom: 20px; }
+    .hero h1 span { color: var(--yellow); text-shadow: 0 0 24px rgba(245,230,66,0.35); }
+    .hero-sub { font-size: 18px; color: var(--muted); max-width: 640px; line-height: 1.75; }
+
+    /* FEATURE SECTIONS */
+    .feat-section { padding: 80px 0; border-bottom: 1px solid var(--border); }
+    .feat-section:last-of-type { border-bottom: none; }
+    .feat-label { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px; display: block; }
+    .feat-section h2 { font-family: 'Space Mono', monospace; font-size: clamp(20px, 2.5vw, 28px); font-weight: 700; color: var(--text); margin-bottom: 16px; line-height: 1.3; }
+    .feat-section .desc { font-size: 17px; color: var(--muted); max-width: 640px; margin-bottom: 48px; line-height: 1.75; }
+
+    /* FEATURE GRID */
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .feat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 28px 24px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .feat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .feat-card.cyan::before { background: var(--cyan); }
+    .feat-card.yellow::before { background: var(--yellow); }
+    .feat-card.pink::before { background: var(--pink); }
+    .feat-card.orange::before { background: var(--orange); }
+    .feat-card:hover { border-color: var(--faint); transform: translateY(-3px); }
+    .feat-icon { font-size: 22px; margin-bottom: 14px; }
+    .feat-card h3 { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.4; }
+    .feat-card p { font-size: 14px; color: var(--muted); line-height: 1.65; margin: 0; }
+
+    /* TWO COLUMN LAYOUT */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; margin-top: 16px; }
+    .two-col-text h3 { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cyan); margin-bottom: 16px; }
+    .two-col-text p { font-size: 15px; color: var(--muted); margin-bottom: 16px; line-height: 1.7; }
+    .two-col-text p:last-child { margin-bottom: 0; }
+
+    /* MOCK CARD */
+    .mock-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .mock-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; }
+    .mock-card.exc::before { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .mock-card.str::before { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    .mock-score-wrap { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+    .mock-badge { width: 56px; height: 56px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; flex-shrink: 0; }
+    .mock-badge.exc { background: rgba(245,230,66,0.12); border: 1.5px solid var(--yellow); }
+    .mock-badge.str { background: rgba(0,229,255,0.1); border: 1.5px solid var(--cyan); }
+    .mock-badge .num { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+    .mock-badge.exc .num { color: var(--yellow); }
+    .mock-badge.str .num { color: var(--cyan); }
+    .mock-badge .tier { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 0.04em; }
+    .mock-badge.exc .tier { color: rgba(245,230,66,0.7); }
+    .mock-badge.str .tier { color: rgba(0,229,255,0.7); }
+    .mock-title { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .mock-co { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .mock-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    .mock-tag { font-family: 'Space Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+    .mock-tag.remote { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.3); color: var(--cyan); }
+    .mock-tag.neutral { background: var(--surface); border: 1px solid var(--border); color: var(--faint); }
+    .mock-bullets { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .mock-bullet { font-size: 13px; display: flex; gap: 6px; }
+    .mock-bullet.pos { color: #4CAF50; }
+    .mock-bullet.neg { color: var(--orange); }
+    .mock-bullet.neu { color: var(--muted); }
+    .mock-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 8px; }
+    .mock-gap { margin-top: 16px; }
+
+    /* KANBAN MOCK */
+    .kanban-mock { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px; }
+    .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+    .kanban-col-header { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .kanban-count { background: var(--surface2); border-radius: 10px; padding: 1px 6px; font-size: 10px; color: var(--faint); }
+    .kanban-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; position: relative; overflow: hidden; }
+    .kanban-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+    .kanban-card.y::before { background: var(--yellow); }
+    .kanban-card.c::before { background: var(--cyan); }
+    .kanban-card.p::before { background: var(--pink); }
+    .kanban-card-title { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+    .kanban-card-co { font-size: 11px; color: var(--muted); }
+    .kanban-card-badge { font-family: 'Space Mono', monospace; font-size: 9px; margin-top: 6px; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+    .kanban-card-badge.round { background: rgba(0,229,255,0.1); color: var(--cyan); }
+    .kanban-card-badge.hired { background: rgba(245,230,66,0.15); color: var(--yellow); }
+
+    /* EVAL MOCK */
+    .eval-mock { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+    .eval-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .eval-tab { font-family: 'Space Mono', monospace; font-size: 11px; padding: 8px 16px; color: var(--faint); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .eval-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .eval-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .eval-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--faint); }
+    .eval-btn { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); font-family: 'Space Mono', monospace; font-size: 11px; padding: 8px 14px; border-radius: 6px; }
+    .eval-result { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--cyan); border-radius: 6px; padding: 12px 14px; }
+    .eval-result-title { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .eval-result-co { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .eval-score-row { display: flex; align-items: center; gap: 10px; }
+    .eval-score { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--cyan); }
+    .eval-tier { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(0,229,255,0.6); }
+
+    /* CHAT MOCK */
+    .chat-mock { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .chat-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .chat-header-title { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--cyan); }
+    .chat-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+    .chat-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .chat-msg { display: flex; gap: 8px; align-items: flex-start; }
+    .chat-msg.user { flex-direction: row-reverse; }
+    .chat-av { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; }
+    .chat-av.c { background: rgba(0,229,255,0.12); border: 1px solid rgba(0,229,255,0.3); color: var(--cyan); }
+    .chat-av.u { background: rgba(245,230,66,0.1); border: 1px solid rgba(245,230,66,0.2); color: var(--yellow); }
+    .chat-bub { max-width: 85%; border-radius: 8px; padding: 8px 12px; font-size: 13px; line-height: 1.55; }
+    .chat-bub.c { background: rgba(0,229,255,0.07); border: 1px solid rgba(0,229,255,0.18); color: #cce8ff; }
+    .chat-bub.u { background: rgba(245,230,66,0.06); border: 1px solid rgba(245,230,66,0.15); color: #fffde0; }
+
+    /* SECTION COLORS */
+    .label-cyan { color: var(--cyan); }
+    .label-yellow { color: var(--yellow); }
+    .label-pink { color: var(--pink); }
+    .label-orange { color: var(--orange); }
+
+    /* PRIVACY BLOCK */
+    .privacy-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan); border-radius: 0 10px 10px 0;
+      padding: 32px 36px; margin-top: 40px;
+    }
+    .privacy-block h3 { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 12px; }
+    .privacy-block p { font-size: 15px; color: var(--muted); margin-bottom: 12px; line-height: 1.7; }
+    .privacy-block p:last-child { margin-bottom: 0; }
+
+    /* FLOW LIST */
+    .flow-list { display: flex; flex-direction: column; gap: 0; margin-top: 32px; }
+    .flow-item { display: flex; gap: 20px; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid var(--border); }
+    .flow-item:last-child { border-bottom: none; }
+    .flow-num { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; line-height: 1; flex-shrink: 0; width: 48px; }
+    .flow-item:nth-child(1) .flow-num { color: var(--yellow); }
+    .flow-item:nth-child(2) .flow-num { color: var(--cyan); }
+    .flow-item:nth-child(3) .flow-num { color: var(--orange); }
+    .flow-item:nth-child(4) .flow-num { color: var(--pink); }
+    .flow-body h3 { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .flow-body p { font-size: 15px; color: var(--muted); margin: 0; line-height: 1.65; }
+
+    footer { padding: 40px 0; border-top: 1px solid var(--border); position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-logo { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--yellow); text-shadow: 0 0 12px rgba(245,230,66,0.3); }
+    .footer-right { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--faint); text-align: right; }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    @media (max-width: 760px) {
+      nav { padding: 0 20px; }
+      .container { padding: 0 20px; }
+      .two-col, .kanban-mock { grid-template-columns: 1fr; }
+      footer { flex-direction: column; align-items: flex-start; }
+      .footer-right { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="streaks" aria-hidden="true">
+  <div class="streak"></div><div class="streak"></div><div class="streak"></div>
+  <div class="streak"></div><div class="streak"></div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">SHORTLIST</a>
+  <ul class="nav-links">
+    <li><a href="#matching">Matching</a></li>
+    <li><a href="#evaluations">Evaluations</a></li>
+    <li><a href="#tracker">Tracker</a></li>
+    <li><a href="#coach">Coach</a></li>
+    <li><a href="#privacy">Privacy</a></li>
+    <li><a href="index.html" class="back">← Build Log</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section>
+<div class="container">
+  <div class="hero reveal">
+    <span class="hero-kicker">What Shortlist Does</span>
+    <h1>Built around the real you,<br/><span>not your keywords.</span></h1>
+    <p class="hero-sub">Shortlist is a locally-run Mac application that matches jobs to who you actually are — your values, your work style, your deal-breakers — not just your job title. Here's how it works.</p>
+  </div>
+</div>
+</section>
+
+<!-- HOW IT WORKS FLOW -->
+<section>
+<div class="container">
+  <div class="feat-section reveal">
+    <span class="feat-label label-cyan">How it works</span>
+    <h2>Four steps from stranger to shortlist.</h2>
+    <p class="desc">Shortlist is designed around a simple idea: you describe yourself, the tool does the work. No Boolean strings. No dropdown hell.</p>
+
+    <div class="flow-list">
+      <div class="flow-item">
+        <div class="flow-num">01</div>
+        <div class="flow-body">
+          <h3>Upload your documents</h3>
+          <p>Drop in your resume, cover letters, or anything else that reflects your work history. Coach reads them so it can ask smarter questions and build a richer profile from the start.</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">02</div>
+        <div class="flow-body">
+          <h3>Talk to Coach</h3>
+          <p>Have a real conversation with an AI that asks what you've loved, what you'd walk away from, what kind of environment brings out your best work, and what you won't settle for. Coach listens and follows up.</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">03</div>
+        <div class="flow-body">
+          <h3>Review and own your profile</h3>
+          <p>Coach synthesizes everything into a structured profile written in your voice. Every section is fully editable — because AI occasionally overstates or fills gaps with plausible-sounding details that aren't accurate. You stay in control of how you're represented.</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">04</div>
+        <div class="flow-body">
+          <h3>Get your shortlist</h3>
+          <p>Jobs are scored against your full profile — values, work style, deal-breakers, salary expectations, and the kinds of companies you've been excited about — and surfaced with plain-language explanations for every result.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- MATCHING -->
+<section>
+<div class="container">
+  <div class="feat-section reveal" id="matching">
+    <span class="feat-label label-yellow">Job Matching</span>
+    <h2>Scored against the whole picture. Explained before you click.</h2>
+    <p class="desc">Every result comes with a score, a tier, and a plain-language breakdown of what matched, what was unknown, and what to watch out for. You'll never click into a job and realize 30 seconds in that it was never close.</p>
+
+    <div class="two-col">
+      <div class="two-col-text">
+        <h3>How scoring works</h3>
+        <p>Jobs are scored 1-10 against your profile using Claude. The score reflects the whole picture — not just title matching — including remote confirmation, salary alignment, company type, values fit, and deal-breaker detection.</p>
+        <p>Results are also weighted by ATS platform quality. Roles from Greenhouse, Lever, and Ashby get a ranking boost because those platforms tend to attract more established, intentional employers. Workday is deprioritized by default — you can adjust this in Preferences.</p>
+        <h3 style="margin-top:28px">Score tiers</h3>
+        <p>9-10: Exceptional. 7-8: Strong Match. 5-6: Close Match. Weak matches are filtered out by default. The threshold is adjustable.</p>
+      </div>
+      <div>
+        <div class="mock-card exc" style="margin-bottom:14px">
+          <div class="mock-score-wrap">
+            <div class="mock-badge exc"><div class="num">9</div><div class="tier">EXCEPTIONAL</div></div>
+            <div>
+              <div class="mock-title">Sr. Business Operations Associate</div>
+              <div class="mock-co">Zapier · Salary not listed</div>
+            </div>
+          </div>
+          <div class="mock-tags">
+            <span class="mock-tag remote">Remote ✓</span>
+            <span class="mock-tag neutral">Full-time</span>
+            <span class="mock-tag neutral">via Ashby</span>
+          </div>
+          <div class="mock-bullets">
+            <div class="mock-bullet pos">✓ Zapier is a direct tool in daily workflow</div>
+            <div class="mock-bullet pos">✓ Remote-first culture matches non-negotiable</div>
+            <div class="mock-bullet pos">✓ Cross-functional ops strategy core to role</div>
+            <div class="mock-bullet neu">— Salary not listed, likely competitive</div>
+          </div>
+        </div>
+        <div class="mock-card str">
+          <div class="mock-score-wrap">
+            <div class="mock-badge str"><div class="num">8</div><div class="tier">STRONG</div></div>
+            <div>
+              <div class="mock-title">Knowledge Management Lead</div>
+              <div class="mock-co">Acme Health · Salary not listed</div>
+            </div>
+          </div>
+          <div class="mock-tags">
+            <span class="mock-tag remote">Remote ✓</span>
+            <span class="mock-tag neutral">Full-time</span>
+            <span class="mock-tag neutral">via Greenhouse</span>
+          </div>
+          <div class="mock-bullets">
+            <div class="mock-bullet pos">✓ Mission-driven org matches values profile</div>
+            <div class="mock-bullet pos">✓ Strong alignment with ops background</div>
+            <div class="mock-bullet neg">✗ Some technical requirements may exceed stack</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- EVALUATIONS -->
+<section>
+<div class="container">
+  <div class="feat-section reveal" id="evaluations">
+    <span class="feat-label label-cyan">Evaluations</span>
+    <h2>Paste a link. Get a score. Keep what you find.</h2>
+    <p class="desc">Beyond the automated search, you can evaluate any job you come across manually. Paste a single job link or point Shortlist at a company careers page and it will find and score every relevant role for you.</p>
+
+    <div class="two-col">
+      <div>
+        <div class="eval-mock">
+          <div class="eval-tabs">
+            <div class="eval-tab active">One role</div>
+            <div class="eval-tab">Full careers page</div>
+          </div>
+          <div class="eval-input-row">
+            <div class="eval-input">jobs.ashbyhq.com/zapier/6b8f88...</div>
+            <div class="eval-btn">Evaluate</div>
+          </div>
+          <div class="eval-result">
+            <div class="eval-result-title">Sr. Business Operations Associate</div>
+            <div class="eval-result-co">Zapier · Remote · via Ashby</div>
+            <div class="eval-score-row">
+              <div class="eval-score">9</div>
+              <div class="eval-tier">EXCEPTIONAL MATCH</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col-text">
+        <h3>One role</h3>
+        <p>Paste any job posting URL. Shortlist fetches the listing via the ATS API (Ashby, Lever, and Greenhouse are fully supported with direct API access) and runs it through the same scoring pipeline as your automated results.</p>
+        <h3>Full careers page</h3>
+        <p>Paste a company careers page URL and Shortlist scans every open role, pre-filters by relevance to your profile, and scores the best matches. Pulls structured job data directly from Ashby, Lever, and Greenhouse APIs rather than scraping.</p>
+        <h3>My Shortlist tab</h3>
+        <p>Manually evaluated jobs live in the My Shortlist tab and persist until you delete them — they never get swept away by a new automated search. Star any result from the Longlist to save it here too.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- TRACKER -->
+<section>
+<div class="container">
+  <div class="feat-section reveal" id="tracker">
+    <span class="feat-label label-pink">Job Pipeline Tracker</span>
+    <h2>From match to hired. All in one place.</h2>
+    <p class="desc">When you mark a role as Applied in My Shortlist, it moves to the Tracker — a kanban board that takes you all the way through the hiring process with tools for every stage.</p>
+
+    <div class="kanban-mock" style="margin-bottom:40px">
+      <div class="kanban-col">
+        <div class="kanban-col-header">Applied <span class="kanban-count">1</span></div>
+        <div class="kanban-card c">
+          <div class="kanban-card-title">Program Ops Manager</div>
+          <div class="kanban-card-co">Bright Org</div>
+          <div class="kanban-card-badge round">Applied Mar 12</div>
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-col-header">Interviewing <span class="kanban-count">1</span></div>
+        <div class="kanban-card y">
+          <div class="kanban-card-title">Sr. BizOps Associate</div>
+          <div class="kanban-card-co">Zapier</div>
+          <div class="kanban-card-badge round">Round 2</div>
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-col-header">Offer <span class="kanban-count">1</span></div>
+        <div class="kanban-card c">
+          <div class="kanban-card-title">Knowledge Mgr</div>
+          <div class="kanban-card-co">Acme Health</div>
+          <div class="kanban-card-badge round">Evaluating offer</div>
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-col-header">Wrapped <span class="kanban-count">1</span></div>
+        <div class="kanban-card p">
+          <div class="kanban-card-title">Comms Coordinator</div>
+          <div class="kanban-card-co">Studio Co</div>
+          <div class="kanban-card-badge hired">HIRED!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat-card cyan">
+        <div class="feat-icon">📋</div>
+        <h3>Interview round tracker</h3>
+        <p>Log each round with date, type (phone screen, panel, take-home), and interviewer profiles including name, title, LinkedIn handle, and notes. Rounds collapse automatically when you move to the Offer stage.</p>
+      </div>
+      <div class="feat-card yellow">
+        <div class="feat-icon">💰</div>
+        <h3>Offer evaluation workspace</h3>
+        <p>Enter offer details and see an automatic comparison against your stated salary floor. A Levels.fyi link for your role is generated automatically. Negotiation log and Coach quick-actions included.</p>
+      </div>
+      <div class="feat-card pink">
+        <div class="feat-icon">🎉</div>
+        <h3>HIRED! celebration</h3>
+        <p>When you accept an offer and mark it HIRED!, the app throws a full celebration — glow worms, confetti, the works. Then Coach opens automatically to help you prep for day one.</p>
+      </div>
+      <div class="feat-card orange">
+        <div class="feat-icon">📝</div>
+        <h3>Lessons Learned</h3>
+        <p>Every closed role has a Lessons Learned field that activates when the card is wrapped. Over time you build a personal record of what worked, what didn't, and what to carry forward.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- COACH -->
+<section>
+<div class="container">
+  <div class="feat-section reveal" id="coach">
+    <span class="feat-label label-cyan">Coach</span>
+    <h2>A job search assistant that actually knows you.</h2>
+    <p class="desc">Coach is a persistent AI assistant available throughout the app. It built your profile, it knows your preferences, and it knows exactly where you are in your search. It gives different help at different stages — and it stays out of the way when you don't need it.</p>
+
+    <div class="two-col">
+      <div>
+        <div class="chat-mock">
+          <div class="chat-header">
+            <div class="chat-dot"></div>
+            <div class="chat-header-title">Coach — Sr. BizOps Associate</div>
+          </div>
+          <div class="chat-body">
+            <div class="chat-msg">
+              <div class="chat-av c">C</div>
+              <div class="chat-bub c">Round 2 for Zapier coming up. Want to do a full prep session, or work on something specific?</div>
+            </div>
+            <div class="chat-msg user">
+              <div class="chat-av u">Y</div>
+              <div class="chat-bub u">Let's work on my STAR stories for the cross-functional execution questions.</div>
+            </div>
+            <div class="chat-msg">
+              <div class="chat-av c">C</div>
+              <div class="chat-bub c">Good call. You have a strong story in your profile about the Samaritan workflow project. Want me to help you shape it specifically for a BizOps framing?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col-text">
+        <h3>Stage-aware help</h3>
+        <p>Coach opens with a different greeting depending on where you are. Applied: it offers to help with follow-up or phone screen prep. Interviewing: interview questions, STAR stories, company research, thank you emails. Offer: evaluation and negotiation. It never surfaces the wrong tools at the wrong time.</p>
+        <h3>Knows your profile</h3>
+        <p>Coach has full context on your profile, your conversation history, your current stage, any notes you've added, and the full job description for the role you're working on. Prep is specific, not generic.</p>
+        <h3>In-scope by design</h3>
+        <p>Coach is scoped to job searching and platform help only. It won't answer coding questions, medical questions, or anything outside its lane — by design.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- PRIVACY -->
+<section>
+<div class="container">
+  <div class="feat-section reveal" id="privacy">
+    <span class="feat-label label-orange">Privacy and Architecture</span>
+    <h2>Your data lives on your machine. Full stop.</h2>
+    <p class="desc">Shortlist is a local Mac application. There is no Shortlist server. There is no account. There is no algorithm learning from your job search. Here's exactly what goes where.</p>
+
+    <div class="privacy-block">
+      <h3>What stays on your machine</h3>
+      <p>Your profiles, your Coach conversation history, the documents you upload, your API keys, your Tracker data, your saved evaluations, your preferences. All of it. None of it leaves your computer through Shortlist.</p>
+      <h3 style="margin-top:20px">What goes out, and where</h3>
+      <p>Two outbound API calls during normal use: job search query strings to JSearch/RapidAPI (no personal data, just search terms), and your profile content plus job listing text to Anthropic for AI scoring. Both use your own API keys, not ours — because there is no ours.</p>
+      <h3 style="margin-top:20px">Why this matters</h3>
+      <p>You are describing yourself, your values, and what you won't settle for. That is personal. It belongs on your machine. You bring your own Anthropic and RapidAPI keys, you control the costs, and nothing routes through Shortlist infrastructure because there isn't any.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- WHAT YOU NEED -->
+<section>
+<div class="container">
+  <div class="feat-section reveal">
+    <span class="feat-label label-yellow">What You Need</span>
+    <h2>Two free API keys and five minutes.</h2>
+    <p class="desc">Shortlist runs on your Mac. You bring two API keys — both have free tiers. A setup guide is included with your download.</p>
+
+    <div class="feat-grid">
+      <div class="feat-card yellow">
+        <div class="feat-icon">🍎</div>
+        <h3>Mac — Apple Silicon or Intel</h3>
+        <p>Shortlist is a local Mac application. Windows support is on the roadmap. Setup takes about five minutes.</p>
+      </div>
+      <div class="feat-card cyan">
+        <div class="feat-icon">🤖</div>
+        <h3>Anthropic API Key</h3>
+        <p>Powers Coach and all AI matching. Get one free at console.anthropic.com. New accounts include free credits.</p>
+      </div>
+      <div class="feat-card orange">
+        <div class="feat-icon">🔍</div>
+        <h3>RapidAPI Key (JSearch)</h3>
+        <p>Powers job search results via Google Jobs data. Free tier at rapidapi.com — 100 requests per month included.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="container">
+  <footer>
+    <div class="footer-logo">SHORTLIST</div>
+    <div class="footer-right">
+      Nan Doud, Peoria IL — March 2026<br/>
+      <a href="index.html" style="color:var(--cyan);text-decoration:none;font-size:11px;">← Back to Build Log</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
