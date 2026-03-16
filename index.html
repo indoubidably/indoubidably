@@ -412,7 +412,7 @@ IMPLEMENTATION NOTES
     <p>The Near You geography results were wrong for longer than I wanted. The app kept pulling results from the DC/Virginia area regardless of what location the user set. I sent multiple fix prompts before it resolved. The root cause was that JSearch's geographic bias was being set at query time, and an earlier performance optimization prompt had broken the parameter passing. Debugging it required tracing the full data pipeline across three files.</p>
 
     <p>The "Have you applied?" button took four attempts to get inside the card and functional. I'm including this because the debugging process — identifying what was actually wrong versus what looked wrong, working within Claude to write increasingly specific fix prompts — is a real skill that I am steadily improving at over the course of this project.</p>
-
+    <p>The light mode (that I'm calling Electric Youth) and accessibility toggles still have some kinks that need working out, which is to be expected as those were major updates with a whole bunch of variables. </p>
     <h3>Decisions I Deferred Deliberately</h3>
     <p>Windows support, PyInstaller packaging, and the Gumroad listing are all on the roadmap but not done. I made a deliberate call to keep building features rather than packaging for distribution while the product was still evolving. The product I'd have shipped right away was nowhere near as robust as what I have now. The fact that it took me just a few weeks to get the product to the point it is at now speaks not only to the power of the tools both to brainstorm and build, but to the power of imagination and determination. I haven't had this much fun in years.</p>
   </div>
