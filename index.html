@@ -466,38 +466,6 @@ IMPLEMENTATION NOTES
   </div>
 </div>
 
-<!-- SECTION 5: CURRENT STATE -->
-<div class="container">
-  <div class="section reveal" id="status">
-    <span class="section-num">05 — Current State</span>
-    <h2>Where it is now. Honest assessment.</h2>
-
-    <p>Shortlist works. I use it. It surfaces real results and the scores are meaningful. Coach builds profiles that sound like the people who created them.</p>
-
-    <table class="status-table">
-      <thead>
-        <tr><th>Feature</th><th>Status</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Coach conversation and profile synthesis</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>Job matching and ATS quality weighting</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>Three-tab Evaluations page (Longlist, My Finds, My Shortlist)</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>Careers page scanner with Ashby, Lever, Greenhouse API integration</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>Job pipeline Tracker with round tracking and Lessons Learned</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>Electric Youth light mode with full theme switching</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>Offer stage with Levels.fyi integration and negotiation tools</td><td><span class="pill wip">In progress</span></td></tr>
-        <tr><td>Resume quality assessment and Coach rebuild offer</td><td><span class="pill wip">In progress</span></td></tr>
-        <tr><td>Accessibility toggles (Reduce Motion, Font Size, High Contrast)</td><td><span class="pill done">Working</span></td></tr>
-        <tr><td>PyInstaller packaging for distribution</td><td><span class="pill later">Deferred</span></td></tr>
-        <tr><td>Windows support</td><td><span class="pill later">Roadmap</span></td></tr>
-        <tr><td>Scheduled search</td><td><span class="pill later">Roadmap</span></td></tr>
-      </tbody>
-    </table>
-
-    <p>This is still an active build. I'm sharing it because the process is at least as interesting as the product, and because I think building something real with these tools says more about how I work than a resume does.</p>
-  </div>
-</div>
-
 <!-- ABOUT -->
 <div class="container">
   <div class="about-block reveal">
@@ -563,9 +531,9 @@ IMPLEMENTATION NOTES
         <div class="log-body">
           <ul>
             <li>Wrapped column overhauled: outcome selector, HIRED! celebration with start date prompt, rotating affirmations, and card archiving with a settings widget</li>
-            <li>Ethics & AI Philosophy page built for both the app and the case study site, with deliberate choices around Coach's emotional honesty and crisis resource handoff</li>
+            <li>Ethics & AI Philosophy page with deliberate choices around Coach's emotional honesty and crisis resource handoff</li>
             <li>Coach streaming speed and brevity tuned to feel like a real conversation at roughly 200 WPM</li>
-            <li>One apostrophe in "I've" took the whole app down — all Phase 2 work is now committed for the first time</li>
+            <li>One apostrophe in "I've" took the whole app down — all Phase 2 work is now committed for the first time. That was scary.</li>
           </ul>
         </div>
       </div>
@@ -574,17 +542,17 @@ IMPLEMENTATION NOTES
       <div class="log-entry">
         <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
           <span class="log-date">Mar 16, 2026</span>
-          <span class="log-summary">Tracker build, Electric Youth mode, accessibility overhaul, and the Zapier application</span>
+          <span class="log-summary">Tracker build, Electric Youth mode, and accessibility overhaul</span>
           <span class="log-chevron">▶</span>
         </button>
         <div class="log-body">
           <ul>
             <li>Full Tracker kanban built: Applied, Interviewing, Offer, and Wrapped columns with drag-and-drop, card numbering, and persistent data</li>
             <li>Interview round tracker added with date fields, interviewer profiles, .ics calendar export, and round-by-round notes</li>
-            <li>Offer column built with salary comparison against floor, Levels.fyi integration, negotiation tools, and a negotiation log</li>
+            <li>Offer column built with salary comparison against floor, Levels.fyi integration (in progress), negotiation tools, and a negotiation log</li>
             <li>Electric Youth light mode launched with a full alternate color palette, toggle in nav and Preferences, and theme-aware animations</li>
             <li>Accessibility pass: Reduce Motion, Font Size, and High Contrast toggles fixed across both themes</li>
-            <li>Applied to Zapier Sr. BizOps role after a recruiter reached out about Shortlist — used the app itself as the answer to the ambiguity question</li>
+            <li>Applied to a role using the app itself as the answer to the ambiguity question</li>
           </ul>
         </div>
       </div>
@@ -592,8 +560,8 @@ IMPLEMENTATION NOTES
       <!-- MARCH 15 (approximate) -->
       <div class="log-entry">
         <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
-          <span class="log-date">Mid-March 2026</span>
-          <span class="log-summary">Evaluations tab, ATS weighting, careers page scanner, and landing page</span>
+          <span class="log-date">March 14-15 2026</span>
+          <span class="log-summary">Evaluations tab, ATS weighting, careers page scanner, and animated landing page</span>
           <span class="log-chevron">▶</span>
         </button>
         <div class="log-body">
@@ -601,7 +569,7 @@ IMPLEMENTATION NOTES
             <li>Evaluations tab built with three input modes: paste a job link, scan a careers page, and run a full Longlist search — all scoring against the active profile</li>
             <li>ATS quality weighting added: Greenhouse 1.15x, Lever and Ashby 1.10x, Workday 0.85x, detected from job_apply_link URLs</li>
             <li>Careers page scanner built with Ashby, Lever, and Greenhouse API detection for structured job feeds instead of scraping</li>
-            <li>Landing page designed and built with illustrated graphics, accessibility improvements, and copy written from scratch</li>
+            <li>Landing page designed and built with illustrated graphics, accessibility improvements, and copy</li>
             <li>My Shortlist tab added with persistent starred cards, applied tracking, and stage management</li>
           </ul>
         </div>
@@ -610,7 +578,7 @@ IMPLEMENTATION NOTES
       <!-- EARLY MARCH -->
       <div class="log-entry">
         <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
-          <span class="log-date">Early March 2026</span>
+          <span class="log-date">March 11-13 2026</span>
           <span class="log-summary">Phase 2 shipped: job matching, Coach widget, search performance, and neon UI polish</span>
           <span class="log-chevron">▶</span>
         </button>
