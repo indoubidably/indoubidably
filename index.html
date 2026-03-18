@@ -554,5 +554,197 @@ IMPLEMENTATION NOTES
   }, { threshold: 0.08 });
   reveals.forEach(el => obs.observe(el));
 </script>
+  <!-- BUILD LOG SECTION - append near bottom of index.html before closing </div> of main container -->
+
+<section id="build-log" style="padding: 80px 0; position: relative; z-index: 1; background: var(--bg);">
+  <div style="max-width: 960px; margin: 0 auto; padding: 0 40px;">
+
+    <span style="font-family:'Space Mono',monospace; font-size:13px; color:var(--cyan); letter-spacing:0.2em; text-transform:uppercase; display:block; margin-bottom:16px;">Build Log</span>
+    <h2 style="font-family:'Space Mono',monospace; font-size:clamp(22px,3vw,32px); font-weight:700; color:var(--text); margin-bottom:12px;">Every day, documented.</h2>
+    <p style="color:var(--muted); font-size:16px; margin-bottom:48px; max-width:600px;">A running record of what got built, what broke, and what was learned. Most recent first.</p>
+
+    <div class="log-entries">
+
+      <!-- MARCH 17 -->
+      <div class="log-entry">
+        <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
+          <span class="log-date">Mar 17, 2026</span>
+          <span class="log-summary">Tracker polish, Ethics page, Coach tuning, and a very expensive apostrophe</span>
+          <span class="log-chevron">▶</span>
+        </button>
+        <div class="log-body">
+          <ul>
+            <li>Wrapped column overhauled: outcome selector, HIRED! celebration with start date prompt, rotating affirmations, and card archiving with a settings widget</li>
+            <li>Ethics & AI Philosophy page built for both the app and the case study site, with deliberate choices around Coach's emotional honesty and crisis resource handoff</li>
+            <li>Coach streaming speed and brevity tuned to feel like a real conversation at roughly 200 WPM</li>
+            <li>One apostrophe in "I've" took the whole app down — all Phase 2 work is now committed for the first time</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MARCH 16 -->
+      <div class="log-entry">
+        <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
+          <span class="log-date">Mar 16, 2026</span>
+          <span class="log-summary">Tracker build, Electric Youth mode, accessibility overhaul, and the Zapier application</span>
+          <span class="log-chevron">▶</span>
+        </button>
+        <div class="log-body">
+          <ul>
+            <li>Full Tracker kanban built: Applied, Interviewing, Offer, and Wrapped columns with drag-and-drop, card numbering, and persistent data</li>
+            <li>Interview round tracker added with date fields, interviewer profiles, .ics calendar export, and round-by-round notes</li>
+            <li>Offer column built with salary comparison against floor, Levels.fyi integration, negotiation tools, and a negotiation log</li>
+            <li>Electric Youth light mode launched with a full alternate color palette, toggle in nav and Preferences, and theme-aware animations</li>
+            <li>Accessibility pass: Reduce Motion, Font Size, and High Contrast toggles fixed across both themes</li>
+            <li>Applied to Zapier Sr. BizOps role after a recruiter reached out about Shortlist — used the app itself as the answer to the ambiguity question</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MARCH 15 (approximate) -->
+      <div class="log-entry">
+        <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
+          <span class="log-date">Mid-March 2026</span>
+          <span class="log-summary">Evaluations tab, ATS weighting, careers page scanner, and landing page</span>
+          <span class="log-chevron">▶</span>
+        </button>
+        <div class="log-body">
+          <ul>
+            <li>Evaluations tab built with three input modes: paste a job link, scan a careers page, and run a full Longlist search — all scoring against the active profile</li>
+            <li>ATS quality weighting added: Greenhouse 1.15x, Lever and Ashby 1.10x, Workday 0.85x, detected from job_apply_link URLs</li>
+            <li>Careers page scanner built with Ashby, Lever, and Greenhouse API detection for structured job feeds instead of scraping</li>
+            <li>Landing page designed and built with illustrated graphics, accessibility improvements, and copy written from scratch</li>
+            <li>My Shortlist tab added with persistent starred cards, applied tracking, and stage management</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- EARLY MARCH -->
+      <div class="log-entry">
+        <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
+          <span class="log-date">Early March 2026</span>
+          <span class="log-summary">Phase 2 shipped: job matching, Coach widget, search performance, and neon UI polish</span>
+          <span class="log-chevron">▶</span>
+        </button>
+        <div class="log-body">
+          <ul>
+            <li>Phase 2 built on top of Phase 1: JSearch via RapidAPI integrated, profile-based AI scoring, and a results Longlist with explained match cards</li>
+            <li>Coach rebuilt as a persistent bottom-right chat widget, detached from the nav, with profile-specific context and conversation history</li>
+            <li>Search performance optimized: parallel remote and local queries, batched scoring, hard cap at 20 results before AI scoring</li>
+            <li>Match card design finalized with score tier badges, green strengths, deal-breaker flags, salary notes, and ATS platform labels</li>
+            <li>Geographic bias fixed, remote-only filter tightened, and loading messages written to make the wait feel intentional</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MARCH 10 -->
+      <div class="log-entry">
+        <button class="log-header" onclick="toggleLog(this)" aria-expanded="false">
+          <span class="log-date">Mar 10, 2026</span>
+          <span class="log-summary">Phase 1 complete: profile synthesis engine, Coach interview, neon UI, first working build</span>
+          <span class="log-chevron">▶</span>
+        </button>
+        <div class="log-body">
+          <ul>
+            <li>Phase 1 built from scratch in one evening: multi-document upload, AI interview conversation, profile synthesis to JSON, and named profile saving</li>
+            <li>First time in a terminal, first time using Claude Code — got a working app running on localhost in about an hour</li>
+            <li>Neon aesthetic designed and built: dark background, gliding light streaks, Space Mono headings, SHORTLIST wordmark with glow</li>
+            <li>Coach branding established, PDF download working, progress indicator and celebration animation added — Phase 1 committed</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /log-entries -->
+  </div>
+</section>
+
+<style>
+.log-entries {
+  border-top: 1px solid var(--border);
+}
+.log-entry {
+  border-bottom: 1px solid var(--border);
+}
+.log-header {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 20px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+}
+.log-header:hover .log-summary {
+  color: var(--cyan);
+}
+.log-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 120px;
+}
+.log-summary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  flex: 1;
+  transition: color 0.2s;
+}
+.log-chevron {
+  font-size: 10px;
+  color: var(--faint);
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+.log-header[aria-expanded="true"] .log-chevron {
+  transform: rotate(90deg);
+}
+.log-body {
+  display: none;
+  padding: 0 0 24px 136px;
+}
+.log-body.open {
+  display: block;
+}
+.log-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.log-body ul li {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+.log-body ul li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--faint);
+}
+@media (max-width: 720px) {
+  .log-header { flex-wrap: wrap; gap: 8px; }
+  .log-date { min-width: unset; }
+  .log-body { padding-left: 0; }
+}
+</style>
+
+<script>
+function toggleLog(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', !isOpen);
+  body.classList.toggle('open', !isOpen);
+}
+</script>
 </body>
 </html>
